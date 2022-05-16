@@ -121,5 +121,28 @@ export default class ApiRouting {
             req.flash('error', "Failed to sign you up, please try again later.");
             res.redirect('/')
         });
+
+        this.router.get('/players', async (req: Request, res: Response) => {
+            const limit = req.query["limit"] as string || undefined;
+            const skip = req.query["skip"] as string || undefined;
+            console.log(`/participants: getting participants at skip: ${skip} and limit ${limit}`);
+            const participants = await this.prisma.player.findMany({
+                select: {
+                    id: true,
+                    username: true,
+                    signupDate: true,
+                    country: true,
+                    rank: true,
+                    bwsRank: true
+                },
+                skip: parseInt(skip),
+                take: parseInt(limit),
+                orderBy: {
+                    bwsRank: 'asc'
+                }
+            });
+            const count = await this.prisma.player.count();
+            res.send({ count, participants })
+        });
     }
 }
