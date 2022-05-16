@@ -3,11 +3,11 @@ import OsuStrategy, { PassportProfile } from "passport-osu";
 import { AuthenticationClient } from "./AuthenticationClient";
 import { IUser } from "./IUser";
 import consola from "consola";
-import { container, injectable } from "tsyringe";
+import { container, singleton } from "tsyringe";
 import passport from "passport";
 import { calculateBws } from '../util';
 
-@injectable()
+@singleton()
 export class OsuAuthentication extends AuthenticationClient {
     protected clientID: string = process.env.OSU2_CLIENT_ID || '';
     protected clientSecret: string = process.env.OSU2_CLIENT_SECRET || '';
@@ -79,7 +79,7 @@ export class OsuAuthentication extends AuthenticationClient {
     protected callbackMiddleWare(req: Request, res: Response, next: NextFunction): void {
         const u = req.user as IUser;
 
-        const that = container.resolve(OsuAuthentication)
+        const that = container.resolve<OsuAuthentication>(OsuAuthentication)
         // User is allowed to join the discord, so go to verification.
         if (that.isInRankRange(req)) 
             res.redirect('/checks/discord');
