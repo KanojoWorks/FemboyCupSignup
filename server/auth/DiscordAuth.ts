@@ -64,7 +64,7 @@ export class DiscordAuthentication extends AuthenticationClient {
     // If this returns 0 then it's successful
     // If this returns 1 then guild member cannot join the guild (as a result of user reaching max guilds)
     // If this returns -1 then there's some fuck up between discord api and the backend
-    private async discordJoin(userId: string, token: string, nickname: string): Promise<number> {
+    public async discordJoin(userId: string, token: string, nickname: string): Promise<number> {
         consola.info(`Attemptingto join ${userId} with ${nickname} to ${this.guildId}`);
         const client = container.resolve(Client) as DiscordBot;
         try {

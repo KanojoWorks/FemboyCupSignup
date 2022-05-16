@@ -1,0 +1,21 @@
+{
+    "host": "bread_chan",
+    "name": "Femboy Cup",
+    "discord": {
+        "guildId": "963679431774314506",
+        "welcomeChannelId": "963679608203538442",
+        "ownerId": "345670350773813250",
+        "roles": [
+            {
+                "id": "975798674661732462",
+                "name": "Verified Player"
+            }
+        ]
+    },
+    "domains": [
+        "femboycup.subject.moe"
+    ],
+    "dev": {
+        "https": false
+    }
+}

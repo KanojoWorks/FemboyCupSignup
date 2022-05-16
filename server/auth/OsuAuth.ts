@@ -3,8 +3,9 @@ import OsuStrategy, { PassportProfile } from "passport-osu";
 import { AuthenticationClient } from "./AuthenticationClient";
 import { IUser } from "./IUser";
 import consola from "consola";
-import { injectable } from "tsyringe";
+import { container, injectable } from "tsyringe";
 import passport from "passport";
+import { calculateBws } from '../util';
 
 @injectable()
 export class OsuAuthentication extends AuthenticationClient {
@@ -37,6 +38,8 @@ export class OsuAuthentication extends AuthenticationClient {
                         token: _accessToken,
                         joinDate: new Date(profile._json.join_date),
                         country: profile._json.country.code,
+                        badgeCount: profile._json.badges.length,
+                        bwsRank: calculateBws(profile._json.statistics.global_rank, profile._json.badges.length),
                         rank: profile._json.statistics.global_rank
                     }
                 }
@@ -44,13 +47,14 @@ export class OsuAuthentication extends AuthenticationClient {
                 return cb(null, o);
             } else {
                 const o: IUser = req.user as any;
-
                 o.osu = {
                     id: profile.id,
                     displayName: profile.displayName,
                     token: _accessToken,
                     joinDate: new Date(profile._json.join_date),
                     country: profile._json.country.code,
+                    badgeCount: profile._json.badges.length,
+                    bwsRank: calculateBws(profile._json.statistics.global_rank, profile._json.badges.length),
                     rank: profile._json.statistics.global_rank
                 }
 
@@ -65,7 +69,7 @@ export class OsuAuthentication extends AuthenticationClient {
 
     public rankCheck(req: Request): boolean {
         const u = req.user as IUser;
-        if (u.osu.rank < 100000 && u.osu.rank > 10000) 
+        if (u.osu.bwsRank < 100000 && u.osu.bwsRank > 10000) 
             return true;
         else
             return false;
@@ -74,13 +78,15 @@ export class OsuAuthentication extends AuthenticationClient {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     protected callbackMiddleWare(req: Request, res: Response, next: NextFunction): void {
         const u = req.user as IUser;
+
+        const that = container.resolve(OsuAuthentication)
         // User is allowed to join the discord, so go to verification.
-        if (this.rankCheck(req)) 
+        if (that.rankCheck(req)) 
             res.redirect('/checks/discord');
         // User failed verification so we redirect somewhere else for manual intervention or can customise the error.
          else {
-            u.failureReason = "osu! player is outside of rank range";
-            consola.warn(`${u.osu.displayName} is now allowed to participant in the tournament. Reason: Rank is ${u.osu.rank}`)
+            u.failureReason = `osu! player is outside of rank range (Rank: ${u.osu.rank} BWS: ${u.osu.bwsRank}`;
+            consola.warn(`${u.osu.displayName} is not allowed to participant in the tournament. Reason: BWS Rank is ${u.osu.bwsRank} (${u.osu.rank})`)
             res.redirect('/checks/notallowed');
         }
     }

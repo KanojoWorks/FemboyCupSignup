@@ -26,6 +26,7 @@ import Configuration from './Configuration';
 import https from 'https';
 import fs from 'fs';
 import flash from 'connect-flash';
+import { PrismaClient } from "@prisma/client";
 
 export default class Server {
     private app: Express;
@@ -42,6 +43,8 @@ export default class Server {
         const nuxt = await loadNuxt(isDev ? 'dev' : 'start', rootDir);
 
         consola.wrapConsole();
+
+        container.register<PrismaClient>(PrismaClient, { useValue: new PrismaClient() });
 
         const redis = container.resolve(RedisSession);
         const redisStore = redis.getStore();
@@ -96,7 +99,7 @@ export default class Server {
         app.use(flash());
 
         consola.info(`Allowed origins: `)
-        for (let i = 0; i < allowedOrigins.length; i++) 
+        for (let i = 0; i < allowedOrigins.length; i++)
             console.log(`- ${allowedOrigins[i]}`);
 
         // Initialise API
@@ -128,15 +131,20 @@ export default class Server {
         if (isDev)
             await build(nuxt);
 
+        function errorRedirect(req: Request, res: Response) {
+            req.flash('error', "You're not authorized to perform this action.");
+            return res.redirect('/')
+        }
+
         app.get('/checks/discord', (req: Request, res: Response, next: NextFunction) => {
             if (req.isAuthenticated()) {
                 if (o.rankCheck(req))
                     return next();
+                else
+                    return errorRedirect(req, res)
             }
-            else {
-                req.flash('error', "You're not authorized to perform this action.");
-                return res.redirect('/')
-            }
+            else
+                return errorRedirect(req, res)
         });
 
         app.use(nuxt.render);
@@ -154,9 +162,9 @@ export default class Server {
             }, app).listen(port, () => {
                 consola.ready(`Serving verifications for ${config.name} on http://localhost:${port}/`);
             });
-        } else 
+        } else
             app.listen(port, host);
-        
+
     }
 }
 

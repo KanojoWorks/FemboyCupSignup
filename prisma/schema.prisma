@@ -19,6 +19,8 @@ model Player {
   osuSignupDate   DateTime
   country         String
   rank            Int
+  bwsRank         Int
+  badges          Int
   termsAccepted   Boolean  @default(false)
   failedScreening Boolean  @default(false)
 }
