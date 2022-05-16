@@ -1,10 +1,10 @@
 <template>
   <div class="start">
     <div>
-      <h1> Welcome to {{ tournament.name }} verification.</h1>
+      <h1> Welcome to {{ tournament.name }} sign-up!</h1>
     </div>
     <div>
-      <p>First we need to verify your account!</p>
+      <p>By signing up on this page you will be entered to participate in {{ tournament.name }}.</p>
       <p>
         You will be asked to login with your osu! account first, and then
         with your Discord account.
@@ -14,6 +14,9 @@
         <li>
           Verify that you own this account, to prevent impersonation of
           others
+        </li>
+        <li>
+          Verify that your rank is between 100.000 and 10.000
         </li>
         <li>
           Attach your osu! username as a nickname in the discord server
@@ -35,14 +38,16 @@
         product and company names are the registered trademarks of their
         original owners.
       </p>
-      <p>This is an <strong>unofficial</strong> server.</p>
       <p>By proceeding you will agree to the <strong>functional</strong> use of cookies.</p>
     </div>
     <a
       href="/auth/osu"
       class="flex button osu"
     > Log in with osu! </a>
-    <p v-if="error !== ''" style="color:#FF4C4C; font-weight:bold; font-size: 1.2rem">{{error}}</p>
+    <p
+      v-if="error !== ''"
+      style="color:#FF4C4C; font-weight:bold; font-size: 1.2rem"
+    >{{error}}</p>
   </div>
 </template>
 <script lang="ts">
@@ -51,14 +56,13 @@ export default Vue.extend({
   data: () => ({}),
   async asyncData({ req, error, $axios }) {
     let body = {
-      error: '',
-      tournament: {}
+      error: "",
+      tournament: {},
     };
 
     if (process.server) {
       const request = req as any;
       if (request.session.flash !== undefined) {
-        console.log(request.session.flash);
         if (request.session.flash.error !== undefined) {
           body.error = request.session.flash.error[0];
           request.flash("error");

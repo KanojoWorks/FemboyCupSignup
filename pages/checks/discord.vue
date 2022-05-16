@@ -2,7 +2,6 @@
   <div class="start">
     <p class="right-align">
       Currently verifying {{ username || "" }} ({{ osuId || "" }})
-      <strong>Log out?</strong>
     </p>
     <div>
       <h1>Connect your Discord account</h1>
@@ -14,7 +13,7 @@
       </p>
       <p>This information will be used to:</p>
       <ul>
-        <li>Join your account to the server, if you haven't yet.</li>
+        <li>Join your account to the server.</li>
         <li>
           Change the nickname on the discord server to your osu! username.
         </li>
@@ -48,14 +47,14 @@ export default Vue.extend({
   name: "VerifyStepTwo",
   async asyncData({ req, $axios }: Context) {
     let username = "???";
-    let osuId = "???";
+    let osuId;
     const roles = await $axios.$get(`/api/discord-roles`);
     if (process.server) {
       const r: any = req;
       if (r.session.passport !== null) {
         const user: IUser = r.session.passport.user;
         username = user.osu.displayName || "???";
-        osuId = user.osu.id || "???";
+        osuId = user.osu.id || 0;
         return { roles, username, osuId };
       }
     }
