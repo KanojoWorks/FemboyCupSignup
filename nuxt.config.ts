@@ -54,7 +54,7 @@ export default {
 
   // Axios module configuration: https://go.nuxtjs.dev/config-axios
   axios: {
-    baseURL: config.dev.https ? 'http://localhost:8001' : 'http://localhost:8000', // Used as fallback if no runtime config is provided
+    baseURL: 'https://femboycup.mirai.gg/', // Used as fallback if no runtime config is provided
   },
 
   // Build Configuration: https://go.nuxtjs.dev/config-build
