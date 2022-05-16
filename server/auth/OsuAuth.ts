@@ -33,10 +33,12 @@ export class OsuAuthentication extends AuthenticationClient {
                 const o: IUser = {
                     discord: {},
                     osu: {
-                        id: `${profile.id}`,
+                        id: profile.id,
                         displayName: profile.displayName,
                         token: _accessToken,
-                        joinDate: DateTime.fromISO(profile._json.join_date)
+                        joinDate: new Date(profile._json.join_date),
+                        country: profile._json.country.code,
+                        rank: profile._json.statistics.global_rank
                     }
                 }
 
@@ -44,10 +46,15 @@ export class OsuAuthentication extends AuthenticationClient {
             } else {
                 const o: IUser = req.user as any;
 
-                o.osu.id = `${profile.id}`;
-                o.osu.token = _accessToken;
-                o.osu.displayName = profile.displayName;
-                o.osu.joinDate = DateTime.fromISO(profile._json.join_date);
+                o.osu = {
+                    id: profile.id,
+                    displayName: profile.displayName,
+                    token: _accessToken,
+                    joinDate: new Date(profile._json.join_date),
+                    country: profile._json.country.code,
+                    rank: profile._json.statistics.global_rank
+                }
+
                 return cb(null, o);
             }
         }));
@@ -62,19 +69,15 @@ export class OsuAuthentication extends AuthenticationClient {
     // Alternatively you can remove everything in the body and just keep: res.redirect('/checks/discord');
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     protected callbackMiddleWare(req: Request, res: Response, next: NextFunction): void {
-        const now = DateTime.now().minus({ months: 6 });
         const u = req.user as IUser;
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        const userJoinDate = u.osu.joinDate!;
 
         // User is allowed to join the discord, so go to verification.
-        if (now > userJoinDate) 
+        if (u.osu.rank < 100000 && u.osu.rank > 10000) 
             res.redirect('/checks/discord');
         // User failed verification so we redirect somewhere else for manual intervention or can customise the error.
          else {
-            u.failureReason = "osu! account is not older than 6 months yet";
-            consola.info(`${u.osu.displayName} joined on ${userJoinDate} needs manual verification.`)
-            res.redirect('/checks/manual');
+            u.failureReason = "osu! player is outside of rank range";
+            res.redirect('/checks/notallowed');
         }
     }
 }

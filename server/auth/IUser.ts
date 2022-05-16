@@ -1,5 +1,3 @@
-import { DateTime } from "luxon";
-
 export interface IUser {
     discord: {
         id?: string;
@@ -7,10 +5,12 @@ export interface IUser {
         token?: string;
     }
     osu: {
-        id?: string;
+        id?: number;
         displayName?: string;
+        rank: number;
         token?: string;
-        joinDate?: DateTime;
+        joinDate?: Date;
+        country?: string;
     }
     failureReason?: string;
 }
