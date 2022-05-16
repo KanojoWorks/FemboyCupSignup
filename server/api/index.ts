@@ -123,9 +123,9 @@ export default class ApiRouting {
         });
 
         this.router.get('/players', async (req: Request, res: Response) => {
-            const limit = req.query["limit"] as string || undefined;
-            const skip = req.query["skip"] as string || undefined;
-            console.log(`/participants: getting participants at skip: ${skip} and limit ${limit}`);
+            const limit = parseInt(req.query["limit"] as string) || undefined;
+            const skip = parseInt(req.query["skip"] as string) || undefined;
+            console.log(`${new Date().toISOString()}:  GET /participants: getting participants at skip: ${skip} and limit ${limit}`);
             const participants = await this.prisma.player.findMany({
                 select: {
                     id: true,
@@ -135,8 +135,8 @@ export default class ApiRouting {
                     rank: true,
                     bwsRank: true
                 },
-                skip: parseInt(skip),
-                take: parseInt(limit),
+                skip: skip,
+                take: limit,
                 orderBy: {
                     bwsRank: 'asc'
                 }
