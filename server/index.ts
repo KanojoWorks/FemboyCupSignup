@@ -93,7 +93,7 @@ export default class Server {
         app.use(session(sessionOptions));
         app.use(passport.initialize());
         app.use(passport.session());
-        app.use(helmet());
+        app.use(helmet({ contentSecurityPolicy: false }));
         app.use(rateLimiterMiddleware);
         app.use(bodyParser.json());
         app.use(flash());
