@@ -5,6 +5,7 @@ import { DiscordAuthentication } from "../auth/DiscordAuth";
 import { IUser } from "../auth/IUser";
 import Configuration from "../Configuration";
 import { PrismaClient } from '@prisma/client';
+import { OsuAuthentication } from "../auth/OsuAuth";
 
 @singleton()
 @autoInjectable()
@@ -65,6 +66,14 @@ export default class ApiRouting {
                 !user.osu.country) {
                 req.flash('error', "You're not authorized to perform this action.");
                 res.redirect('/');
+                return;
+            }
+
+            const osu = container.resolve(OsuAuthentication);
+            if (!osu.isInRankRange(req)) {
+                user.failureReason = `osu! player is outside of rank range (Rank: ${user.osu.rank} BWS: ${user.osu.bwsRank}`;
+                consola.warn(`${user.osu.displayName} is not allowed to participant in the tournament. Reason: BWS Rank is ${user.osu.bwsRank} (${user.osu.rank})`)    
+                res.redirect('/checks/notallowed');
                 return;
             }
 

@@ -138,7 +138,7 @@ export default class Server {
 
         app.get('/checks/discord', (req: Request, res: Response, next: NextFunction) => {
             if (req.isAuthenticated()) {
-                if (o.rankCheck(req))
+                if (o.isInRankRange(req))
                     return next();
                 else
                     return errorRedirect(req, res)

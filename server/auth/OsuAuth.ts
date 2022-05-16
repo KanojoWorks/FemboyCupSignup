@@ -40,7 +40,7 @@ export class OsuAuthentication extends AuthenticationClient {
                         country: profile._json.country.code,
                         badgeCount: profile._json.badges.length,
                         bwsRank: calculateBws(profile._json.statistics.global_rank, profile._json.badges.length),
-                        rank: profile._json.statistics.global_rank
+                        rank: profile._json.statistics.global_rank,
                     }
                 }
 
@@ -55,7 +55,7 @@ export class OsuAuthentication extends AuthenticationClient {
                     country: profile._json.country.code,
                     badgeCount: profile._json.badges.length,
                     bwsRank: calculateBws(profile._json.statistics.global_rank, profile._json.badges.length),
-                    rank: profile._json.statistics.global_rank
+                    rank: profile._json.statistics.global_rank,
                 }
 
                 return cb(null, o);
@@ -67,9 +67,9 @@ export class OsuAuthentication extends AuthenticationClient {
         consola.success("osu! authentication routes are registered.")
     }
 
-    public rankCheck(req: Request): boolean {
+    public isInRankRange(req: Request): boolean {
         const u = req.user as IUser;
-        if (u.osu.bwsRank < 100000 && u.osu.bwsRank > 10000) 
+        if (u.osu.bwsRank < 100000 && u.osu.bwsRank > 10000)
             return true;
         else
             return false;
@@ -81,7 +81,7 @@ export class OsuAuthentication extends AuthenticationClient {
 
         const that = container.resolve(OsuAuthentication)
         // User is allowed to join the discord, so go to verification.
-        if (that.rankCheck(req)) 
+        if (that.isInRankRange(req)) 
             res.redirect('/checks/discord');
         // User failed verification so we redirect somewhere else for manual intervention or can customise the error.
          else {
