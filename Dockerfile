@@ -7,4 +7,4 @@ RUN yarn install
 COPY . /app
 RUN yarn build
 EXPOSE 8000
-CMD ["yarn", "start"]
+CMD ["yarn", "live"]
