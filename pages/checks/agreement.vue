@@ -9,7 +9,7 @@
 
     <div class="grid">
       <a
-        href="/finishSignup"
+        href="/api/finishSignup"
         class="flex button"
       > I agree
       </a>
