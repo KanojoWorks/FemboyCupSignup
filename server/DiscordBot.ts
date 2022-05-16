@@ -26,7 +26,7 @@ export default class DiscordBot extends Client {
                 const channelId = this.tourneyConfig.discord.welcomeChannelId;
                 const channel = guild.channels.cache.get(channelId) as TextChannel;
 
-                channel.send(`Welcome ${member} you are now verified!`)
+                channel.send(`Welcome to femboy cup ${member}, you are now verified!`)
             } catch (e) {
                 consola.error(e);
             }
