@@ -4,7 +4,9 @@
       <h1>Welcome to the Femboy Cup!</h1>
     </div>
     <div>
-      <p>Your account is now verified. Welcome to the server!</p>
+      <p>You have successfully signed up and are joined to the discord server, welcome!</p>
+      <p>If you have any questions or concerns, feel free to contact bread_chan or another admin.</p>
+      <p>We hope you enjoy participating!</p>
       <p>You can now close this browser tab.</p>
     </div>
   </div>
