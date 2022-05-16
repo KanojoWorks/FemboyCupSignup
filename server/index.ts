@@ -129,8 +129,10 @@ export default class Server {
             await build(nuxt);
 
         app.get('/checks/discord', (req: Request, res: Response, next: NextFunction) => {
-            if (req.isAuthenticated())
-                return next();
+            if (req.isAuthenticated()) {
+                if (o.rankCheck(req))
+                    return next();
+            }
             else {
                 req.flash('error', "You're not authorized to perform this action.");
                 return res.redirect('/')

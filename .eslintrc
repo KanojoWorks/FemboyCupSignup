@@ -56,7 +56,6 @@
         "prefer-regex-literals": "warn",
         "prefer-template": "error",
         "prefer-spread": "warn",
-        "sort-imports": "warn",
         "yoda": "warn",
         "no-multiple-empty-lines": [
             "error",

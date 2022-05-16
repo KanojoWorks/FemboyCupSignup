@@ -1,8 +1,7 @@
 <template>
   <div id="start">
     <div>
-      <h1>Manual verification required</h1>
-      <p>Please ping the @Moderators role in the verification channel with a screenshot of this page.</p>
+      <h1>{{ user.osu.displayName }}, you're not allowed to join the tournament. User ID: {{ user.osu.id }}</h1>
       <p>Reason: {{ reason }}</p>
     </div>
   </div>
@@ -16,9 +15,9 @@ export default Vue.extend({
     if (process.server) {
       const r: any = req;
       const user: IUser = r.session.passport.user;
-      const reason = user.failureReason || 'Blame subject';
-      return { reason }
+      const reason = user.failureReason || "Unkown error";
+      return { reason, user };
     }
-  }
+  },
 });
 </script>

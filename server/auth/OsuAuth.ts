@@ -1,7 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import OsuStrategy, { PassportProfile } from "passport-osu";
 import { AuthenticationClient } from "./AuthenticationClient";
-import { DateTime } from "luxon";
 import { IUser } from "./IUser";
 import consola from "consola";
 import { injectable } from "tsyringe";
@@ -64,19 +63,24 @@ export class OsuAuthentication extends AuthenticationClient {
         consola.success("osu! authentication routes are registered.")
     }
 
-    // You can insert your own method of checking here if you're familiar with TypeScript.
-    // This simple example checks whether a user's account is older than 6 months to prevent new account spam on the tournament hub.
-    // Alternatively you can remove everything in the body and just keep: res.redirect('/checks/discord');
+    public rankCheck(req: Request): boolean {
+        const u = req.user as IUser;
+        if (u.osu.rank < 100000 && u.osu.rank > 10000) 
+            return true;
+        else
+            return false;
+    }
+
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     protected callbackMiddleWare(req: Request, res: Response, next: NextFunction): void {
         const u = req.user as IUser;
-
         // User is allowed to join the discord, so go to verification.
-        if (u.osu.rank < 100000 && u.osu.rank > 10000) 
+        if (this.rankCheck(req)) 
             res.redirect('/checks/discord');
         // User failed verification so we redirect somewhere else for manual intervention or can customise the error.
          else {
             u.failureReason = "osu! player is outside of rank range";
+            consola.warn(`${u.osu.displayName} is now allowed to participant in the tournament. Reason: Rank is ${u.osu.rank}`)
             res.redirect('/checks/notallowed');
         }
     }
