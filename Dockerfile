@@ -6,5 +6,6 @@ COPY yarn.lock /app
 RUN yarn install
 COPY . /app
 RUN yarn build
+RUN yarn prisma generate
 EXPOSE 8000
 CMD ["yarn", "live"]
