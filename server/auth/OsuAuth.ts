@@ -27,6 +27,7 @@ export class OsuAuthentication extends AuthenticationClient {
             clientID: this.clientID,
             clientSecret: this.clientSecret,
             callbackURL: this.callbackURL,
+            userProfileUrl: 'https://osu.ppy.sh/api/v2/me/osu',
             passReqToCallback: true,
         }, (req: Request, _accessToken: string, _refreshToken: string, profile: PassportProfile, cb: any) => {
             if (!req.user) {

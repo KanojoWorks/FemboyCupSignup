@@ -7329,10 +7329,10 @@ passport-oauth2@^1.5.0:
     uid2 "0.0.x"
     utils-merge "1.x.x"
 
-passport-osu@^1.0.8:
-  version "1.0.8"
-  resolved "https://registry.yarnpkg.com/passport-osu/-/passport-osu-1.0.8.tgz#a79197312e740c7bbbbc9dc478d5e380f1f22a5d"
-  integrity sha512-faCoU3tdFVGw1rfYrSj+3mUaoxhP4L5kbH2yFvV5Mk5PfuX9+GZwWBunKYzyee6IxZCrADYa4G7JXcZTKQHiuw==
+passport-osu@^1.2.0:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/passport-osu/-/passport-osu-1.2.0.tgz#eb0e00ed2efb75189f2b924578cd0544a88044f0"
+  integrity sha512-X9SvJjOVf6cZ+zI+lzJ/r1DBlhC/46rF+T+Cx5tm72UOdzhHmhCghGlTM92gFNysidsIiKo8gPsc6MVyWqQcLQ==
   dependencies:
     "@types/passport-oauth2" "^1.4.9"
     passport "^0.4.1"

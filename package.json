@@ -38,7 +38,7 @@
     "nodemon": "^2.0.9",
     "nuxt": "2.15.8",
     "passport": "^0.4.1",
-    "passport-osu": "^1.0.8",
+    "passport-osu": "^1.2.0",
     "prisma": "^3.14.0",
     "rate-limiter-flexible": "^2.2.2",
     "redis": "v3",
