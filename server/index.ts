@@ -154,24 +154,30 @@ export default class Server {
         const osuApi = container.resolve<OsuApi2>(OsuApi2);
         await osuApi.initalise();
         const prisma = container.resolve<PrismaClient>(PrismaClient);
-        const players = await prisma.player.findMany({});
+        
+        async function updatePlayers() {
+            const players = await prisma.player.findMany({});
 
-        for (let i = 0; i < players.length; i++) {
-            const player = players[i];
-            try {
-                await osuApi.updateRank(player.id);
-                const p = await prisma.player.findUnique({
-                    where: {
-                        id: player.id
-                    }
-                });
-    
-                if (!o.isInRankRange(p.bwsRank))
-                    consola.warn(`${p.username} with ${p.discordUsername} is not eligible anymore. BWS Rank: ${p.bwsRank} (${p.rank})`)
-            } catch (e) {
-                consola.error(e);
+            for (let i = 0; i < players.length; i++) {
+                const player = players[i];
+                try {
+                    await osuApi.updateRank(player.id);
+                    const p = await prisma.player.findUnique({
+                        where: {
+                            id: player.id
+                        }
+                    });
+        
+                    if (!o.isInRankRange(p.bwsRank))
+                        consola.warn(`${p.username} with ${p.discordUsername} is not eligible anymore. BWS Rank: ${p.bwsRank} (${p.rank})`)
+                } catch (e) {
+                    consola.error(e);
+                }
             }
         }
+
+        setInterval(updatePlayers, 12 * 60 * 60 * 1000);
+        await updatePlayers();
 
         // Set to 127.0.0.1 for localhost only
         const host = '0.0.0.0';
