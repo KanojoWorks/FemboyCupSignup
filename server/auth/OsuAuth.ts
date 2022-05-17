@@ -67,9 +67,8 @@ export class OsuAuthentication extends AuthenticationClient {
         consola.success("osu! authentication routes are registered.")
     }
 
-    public isInRankRange(req: Request): boolean {
-        const u = req.user as IUser;
-        if (u.osu.bwsRank < 100000 && u.osu.bwsRank > 10000)
+    public isInRankRange(bwsRank: number): boolean {
+        if (bwsRank < 100000 && bwsRank > 10000)
             return true;
         else
             return false;
@@ -81,7 +80,7 @@ export class OsuAuthentication extends AuthenticationClient {
 
         const that = container.resolve<OsuAuthentication>(OsuAuthentication)
         // User is allowed to join the discord, so go to verification.
-        if (that.isInRankRange(req)) 
+        if (that.isInRankRange(u.osu.bwsRank)) 
             res.redirect('/checks/discord');
         // User failed verification so we redirect somewhere else for manual intervention or can customise the error.
          else {

@@ -70,7 +70,7 @@ export default class ApiRouting {
             }
 
             const osu = container.resolve<OsuAuthentication>(OsuAuthentication);
-            if (!osu.isInRankRange(req)) {
+            if (!osu.isInRankRange(user.osu.bwsRank)) {
                 user.failureReason = `osu! player is outside of rank range (Rank: ${user.osu.rank} BWS: ${user.osu.bwsRank}`;
                 consola.warn(`${user.osu.displayName} is not allowed to participant in the tournament. Reason: BWS Rank is ${user.osu.bwsRank} (${user.osu.rank})`)    
                 res.redirect('/checks/notallowed');
