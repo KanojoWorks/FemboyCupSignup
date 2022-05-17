@@ -105,7 +105,7 @@ export class OsuAuthentication extends AuthenticationClient {
             let bad = false;
 
             for (let j = 0; j < stupidBadges.length; j++) {
-                if (badge.description.indexOf(stupidBadges[j]) >= 0)
+                if (badge.description.toLowerCase().indexOf(stupidBadges[j]) >= 0)
                     bad = true;
             }
             if (!bad) badgeCount++;
