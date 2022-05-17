@@ -6,6 +6,7 @@ import consola from "consola";
 import { container, singleton } from "tsyringe";
 import passport from "passport";
 import { calculateBws } from '../util';
+import { Badge } from '../IOsuApiUser';
 
 @singleton()
 export class OsuAuthentication extends AuthenticationClient {
@@ -30,6 +31,11 @@ export class OsuAuthentication extends AuthenticationClient {
             userProfileUrl: 'https://osu.ppy.sh/api/v2/me/osu',
             passReqToCallback: true,
         }, (req: Request, _accessToken: string, _refreshToken: string, profile: PassportProfile, cb: any) => {
+            let badgeCount = 0;
+
+            if (profile._json.badges.length > 0)
+                badgeCount = this.filterBadges(profile._json.badges);
+
             if (!req.user) {
                 const o: IUser = {
                     discord: {},
@@ -39,8 +45,8 @@ export class OsuAuthentication extends AuthenticationClient {
                         token: _accessToken,
                         joinDate: new Date(profile._json.join_date),
                         country: profile._json.country.code,
-                        badgeCount: profile._json.badges.length,
-                        bwsRank: calculateBws(profile._json.statistics.global_rank, profile._json.badges.length),
+                        badgeCount: badgeCount,
+                        bwsRank: calculateBws(profile._json.statistics.global_rank, badgeCount),
                         rank: profile._json.statistics.global_rank,
                     }
                 }
@@ -54,8 +60,8 @@ export class OsuAuthentication extends AuthenticationClient {
                     token: _accessToken,
                     joinDate: new Date(profile._json.join_date),
                     country: profile._json.country.code,
-                    badgeCount: profile._json.badges.length,
-                    bwsRank: calculateBws(profile._json.statistics.global_rank, profile._json.badges.length),
+                    badgeCount: badgeCount,
+                    bwsRank: calculateBws(profile._json.statistics.global_rank, badgeCount),
                     rank: profile._json.statistics.global_rank,
                 }
 
@@ -75,16 +81,48 @@ export class OsuAuthentication extends AuthenticationClient {
             return false;
     }
 
+    public filterBadges(badges: Badge[]): number {
+        let badgeCount = 0
+        const stupidBadges = [
+            "contrib",
+            "nomination",
+            "assessment",
+            "moderation",
+            "spotlight",
+            "mapper",
+            "mapping",
+            "aspire",
+            "monthly",
+            "exemplary",
+            "outstanding",
+            "longstanding",
+            "idol",
+            "pending"
+        ];
+
+        for (let i = 0; i < badges.length; i++) {
+            const badge = badges[i];
+            let bad = false;
+
+            for (let j = 0; j < stupidBadges.length; j++) {
+                if (badge.description.indexOf(stupidBadges[j]) >= 0)
+                    bad = true;
+            }
+            if (!bad) badgeCount++;
+        }
+        return badgeCount;
+    }
+
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     protected callbackMiddleWare(req: Request, res: Response, next: NextFunction): void {
         const u = req.user as IUser;
 
         const that = container.resolve<OsuAuthentication>(OsuAuthentication)
         // User is allowed to join the discord, so go to verification.
-        if (that.isInRankRange(u.osu.bwsRank)) 
+        if (that.isInRankRange(u.osu.bwsRank))
             res.redirect('/checks/discord');
         // User failed verification so we redirect somewhere else for manual intervention or can customise the error.
-         else {
+        else {
             u.failureReason = `osu! player is outside of rank range (Rank: ${u.osu.rank} BWS: ${u.osu.bwsRank}`;
             consola.warn(`${u.osu.displayName} is not allowed to participant in the tournament. Reason: BWS Rank is ${u.osu.bwsRank} (${u.osu.rank})`)
             res.redirect('/checks/notallowed');
