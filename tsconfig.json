@@ -8,13 +8,14 @@
             "ESNext.AsyncIterable",
             "DOM"
         ],
+        "strict": true,
         "esModuleInterop": true,
         "allowJs": true,
         "sourceMap": true,
-        "strict": true,
         "noEmit": true,
         "experimentalDecorators": true,
         "resolveJsonModule": true,
+        "strictPropertyInitialization": false,
         "baseUrl": ".",
         "paths": {
             "~/*": [
