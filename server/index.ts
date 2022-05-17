@@ -27,6 +27,8 @@ import https from 'https';
 import fs from 'fs';
 import flash from 'connect-flash';
 import { PrismaClient } from "@prisma/client";
+import OsuApi2 from "./OsuApiv2";
+import { IUser } from "./auth/IUser";
 
 export default class Server {
     private app: Express;
@@ -148,6 +150,28 @@ export default class Server {
         });
 
         app.use(nuxt.render);
+
+        const osuApi = container.resolve<OsuApi2>(OsuApi2);
+        await osuApi.initalise();
+        const prisma = container.resolve<PrismaClient>(PrismaClient);
+        const players = await prisma.player.findMany({});
+
+        for (let i = 0; i < players.length; i++) {
+            const player = players[i];
+            try {
+                await osuApi.updateRank(player.id);
+                const p = await prisma.player.findUnique({
+                    where: {
+                        id: player.id
+                    }
+                });
+    
+                if (!o.isInRankRange(p.bwsRank))
+                    consola.warn(`${p.username} with ${p.discordUsername} is not eligible anymore. BWS Rank: ${p.bwsRank} (${p.rank})`)
+            } catch (e) {
+                consola.error(e);
+            }
+        }
 
         // Set to 127.0.0.1 for localhost only
         const host = '0.0.0.0';
