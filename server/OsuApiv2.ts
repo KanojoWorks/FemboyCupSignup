@@ -1,8 +1,11 @@
 import { PrismaClient } from "@prisma/client";
 import axios from "axios";
-import { singleton } from "tsyringe";
+import { container, singleton } from "tsyringe";
 import { calculateBws } from "./util";
 import consola from 'consola';
+import rateLimit, { RateLimitedAxiosInstance } from 'axios-rate-limit';
+import { OsuAuthentication } from "./auth/OsuAuth";
+import { IOsuAPIUser } from "./IOsuApiUser";
 
 @singleton()
 export default class OsuApi2 {
@@ -17,7 +20,8 @@ export default class OsuApi2 {
         }
     }
     private prisma: PrismaClient;
-    private baseUrl = 'https://osu.ppy.sh'
+    private baseUrl = 'https://osu.ppy.sh';
+    private http: RateLimitedAxiosInstance;
 
     constructor(prisma?: PrismaClient) {
         if (!prisma)
@@ -44,16 +48,21 @@ export default class OsuApi2 {
                 "Content-Type": "application/json"
             }
         });
+
         this.tokenData = r.data;
         this.axiosConfig.headers.Authorization = `${this.tokenData.token_type} ${this.tokenData.access_token}`
+
+        this.http = rateLimit(axios.create(this.axiosConfig), { maxRequests: 10, perMilliseconds: 1000 });
     }
 
     public async updateRank(id: number): Promise<void> {
         const endpoint = `/api/v2/users/${id}/osu`
         try {
-            const result = await axios.get(`${this.baseUrl}${endpoint}`, this.axiosConfig);
-            const rank = result.data.statistics.global_rank;
-            const badgeCount = result.data.badges.length;
+            const req = await this.http.get(`${this.baseUrl}${endpoint}`, this.axiosConfig);
+            const result = req.data as IOsuAPIUser;
+            const rank = result.statistics.global_rank;
+            const osu = container.resolve<OsuAuthentication>(OsuAuthentication);
+            const badgeCount = osu.filterBadges(result.badges);
             const bwsRank = calculateBws(rank, badgeCount);
 
             const player = await this.prisma.player.update({
