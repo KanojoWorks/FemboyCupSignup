@@ -193,7 +193,6 @@ export default class Server {
         }
 
         setInterval(updatePlayers, 12 * 60 * 60 * 1000);
-        await updatePlayers();
     }
 }
 
