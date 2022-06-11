@@ -64,8 +64,7 @@ export default class OsuApi2 {
             const osu = container.resolve<OsuAuthentication>(OsuAuthentication);
             const badgeCount = osu.filterBadges(result.badges);
             const bwsRank = calculateBws(rank, badgeCount);
-
-            const player = await this.prisma.player.update({
+            await this.prisma.player.update({
                 where: {
                     id
                 },
@@ -75,8 +74,6 @@ export default class OsuApi2 {
                     badges: badgeCount
                 }
             });
-
-            consola.success(`Updated ${player}'s rank!`)
         } catch (e) {
             consola.error(`Error updating rank: ${e}`)
         }
